@@ -1,6 +1,7 @@
 package ac.liv.csc.comp201;
 
 import ac.liv.csc.comp201.control.CoinControl;
+import ac.liv.csc.comp201.control.DrinkMaking;
 import ac.liv.csc.comp201.control.HotWaterControl;
 import ac.liv.csc.comp201.model.IMachine;
 import ac.liv.csc.comp201.model.IMachineController;
@@ -28,7 +29,7 @@ public class MachineController  extends Thread implements IMachineController {
 		machine.getKeyPad().setCaption(6,"Dispense milk");
 		machine.getKeyPad().setCaption(7,"Cold water on");
 		machine.getKeyPad().setCaption(8,"Cold water off");
-		
+		machine.getKeyPad().setCaption(9, "test");//test button
 		super.start();
 	}
 	
@@ -50,13 +51,14 @@ public class MachineController  extends Thread implements IMachineController {
 		
 		CoinControl handleCoin = new CoinControl(machine);
 		HotWaterControl handleWater = new HotWaterControl(machine);
+		DrinkMaking drinkMaking = new DrinkMaking(machine);
 		
 		handleWater.controlTemperature();
 		handleWater.cannotControlTemperature();
 		
 		Cup cup=machine.getCup();
 		if (cup!=null) {
-			System.out.println("Water level is "+cup.getWaterLevelLitres()+" coffee is "+cup.getCoffeeGrams()+" grams");
+			System.out.println("Water level is "+cup.getWaterLevelLitres()+" coffee is "+cup.getCoffeeGrams()+" grams"+" temp is "+cup.getTemperatureInC());
 			if (cup.getCoffeeGrams()>=5) {
 				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
 			}
@@ -67,10 +69,13 @@ public class MachineController  extends Thread implements IMachineController {
 		if (coinCode!=null) {
 			System.out.println("Got coin code .."+coinCode);
 			machine.getDisplay().setTextString("Got coin code .."+coinCode);
+			
+			
 			currentCredit=handleCoin.insertedCoin(coinCode,currentCredit);
-			machine.getDisplay().setTextString("Now coin"+currentCredit);
+			machine.getDisplay().setTextString("Now coin"+(currentCredit/100));
 			//handleCoin.CoinAmount(coinCode);
 			handleCoin.printCoinLevel();
+			System.out.println(machine.getBalance());
 			
 		}
 		switch (keyCode) {
@@ -96,6 +101,9 @@ public class MachineController  extends Thread implements IMachineController {
 				break;
 			case 8 :
 				machine.getWaterHeater().setColdWaterTap(false);
+				break;
+			case 9:
+				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
 				break;
 				
 		}

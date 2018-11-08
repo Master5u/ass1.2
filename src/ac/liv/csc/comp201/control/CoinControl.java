@@ -30,14 +30,17 @@ public class CoinControl {
 	
 	public double insertedCoin (String coinCode, double currentCredit) {
 		//need change line; should be in Machinecontroller
+		int coin = machine.getBalance();
 		switch (coinCode) {
-		case "ab" : currentCredit+=0.010;break;
-		case "ac" : currentCredit+=0.050;break;
-		case "ba" : currentCredit+=0.100;break;
-		case "bc" : currentCredit+=0.200;break;
-		case "bd" : currentCredit+=0.500;break;
-		case "ef" : currentCredit+=1.000;break;
+		case "ab" : coin+=1;break;
+		case "ac" : coin+=5;break;
+		case "ba" : coin+=10;break;
+		case "bc" : coin+=20;break;
+		case "bd" : coin+=50;break;
+		case "ef" : coin+=100;break;
 		}
+		machine.setBalance(coin);
+		currentCredit = coin;
 		return currentCredit;
 	}
 	
