@@ -20,16 +20,28 @@ public class MachineController  extends Thread implements IMachineController {
 	
 	public void startController(IMachine machine) {
 		this.machine=machine;				// Machine that is being controlled
-		machine.getKeyPad().setCaption(0,"Cup");
-		machine.getKeyPad().setCaption(1,"Water heater on");
-		machine.getKeyPad().setCaption(2,"Water heater off");		
-		machine.getKeyPad().setCaption(3,"Hot Water On");
-		machine.getKeyPad().setCaption(4,"Hot Water Off");		
-		machine.getKeyPad().setCaption(5,"Dispense coffee");
-		machine.getKeyPad().setCaption(6,"Dispense milk");
-		machine.getKeyPad().setCaption(7,"Cold water on");
-		machine.getKeyPad().setCaption(8,"Cold water off");
-		machine.getKeyPad().setCaption(9, "test");//test button
+//		machine.getKeyPad().setCaption(0,"Cup");
+//		machine.getKeyPad().setCaption(1,"Water heater on");
+//		machine.getKeyPad().setCaption(2,"Water heater off");		
+//		machine.getKeyPad().setCaption(3,"Hot Water On");
+//		machine.getKeyPad().setCaption(4,"Hot Water Off");		
+//		machine.getKeyPad().setCaption(5,"Dispense coffee");
+//		machine.getKeyPad().setCaption(6,"Dispense milk");
+//		machine.getKeyPad().setCaption(7,"Cold water on");
+//		machine.getKeyPad().setCaption(8,"Cold water off");
+//		machine.getKeyPad().setCaption(9, "test");//test button
+//		
+		
+		machine.getKeyPad().setCaption(0,"1");
+		machine.getKeyPad().setCaption(1,"2");
+		machine.getKeyPad().setCaption(2,"3");		
+		machine.getKeyPad().setCaption(3,"4");
+		machine.getKeyPad().setCaption(4,"5");		
+		machine.getKeyPad().setCaption(5,"6");
+		machine.getKeyPad().setCaption(6,"7");
+		machine.getKeyPad().setCaption(7,"8");
+		machine.getKeyPad().setCaption(8,"9");
+		machine.getKeyPad().setCaption(9, "return changes");//test button
 		super.start();
 	}
 	
@@ -102,10 +114,39 @@ public class MachineController  extends Thread implements IMachineController {
 			case 8 :
 				machine.getWaterHeater().setColdWaterTap(false);
 				break;
-			case 9:
-				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
-				break;
+//			case 9:
+//				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
+//				break;
 				
+				
+//			case 0 :
+//				System.out.println("Vending cup");
+//				machine.vendCup(Cup.SMALL_CUP);break;
+//			case 1 :
+//				machine.getWaterHeater().setHeaterOn();								
+//				break;
+//			case 2 :
+//				machine.getWaterHeater().setHeaterOff();break;
+//			case 3 :
+//				machine.getWaterHeater().setHotWaterTap(true);
+//				break;
+//			case 4 :
+//				machine.getWaterHeater().setHotWaterTap(false);break;
+//			case 5 :
+//				machine.getHoppers().setHopperOn(Hoppers.COFFEE);break;
+//			case 6 :
+//				machine.getHoppers().setHopperOn(Hoppers.MILK);break;			
+//			case 7 :
+//				machine.getWaterHeater().setColdWaterTap(true);
+//				break;
+//			case 8 :
+//				machine.getWaterHeater().setColdWaterTap(false);
+//				break;
+			case 9:
+				handleCoin.returnChange();
+				machine.getCoinHandler().getCoinTray();
+				machine.getCoinHandler().clearCoinTry();
+				break;
 		}
 		
 	}

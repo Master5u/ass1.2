@@ -6,17 +6,11 @@ public class CoinControl {
 	
 	public static final String coinCodes[]={"ab","ac","ba","bc","bd","ef","zz" };
 	public static final String coinNames[]={"1p","5p","10p","20p","50p","100p" };
-	
+	public static final int coinValue[]={1,5,10,20,50,100};
 	private IMachine machine;
 
 	public CoinControl (IMachine machine) {
 		this.machine = machine;
-	}
-	
-	public void CoinAmount (String coinCode) {// repeat function as assCoin;should delete!!
-		if(machine.getCoinHandler().coinAvailable(coinCode)) {
-			//machine.getCoinHandler().setHopperLevel(coinCode, machine.getCoinHandler().getCoinHopperLevel(coinCode)+1);
-		}
 	}
 	
 	public void printCoinLevel() { //print coin in console
@@ -42,6 +36,22 @@ public class CoinControl {
 		machine.setBalance(coin);
 		currentCredit = coin;
 		return currentCredit;
+	}
+	
+	public void returnChange () {
+		System.out.println("start changes");
+		int change = machine.getBalance();		
+		for(int index = coinValue.length-1;index>=0;index--) {
+			while(change/coinValue[index]>0&&machine.getCoinHandler().coinAvailable(coinCodes[index])) {
+//				int time = 1;
+//				System.out.println(index+" times: "+time);
+//				time++;
+					machine.getCoinHandler().dispenseCoin(coinCodes[index]);
+					change = change-coinValue[index];
+					machine.setBalance(change);
+					System.out.println("now balance: "+change);
+			}
+		}
 	}
 	
 	
