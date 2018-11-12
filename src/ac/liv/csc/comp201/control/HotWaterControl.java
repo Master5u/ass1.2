@@ -22,7 +22,7 @@ public class HotWaterControl {
 	
 	public void controlTemperature () {
 		float temperature = machine.getWaterHeater().getTemperatureDegreesC();
-		if(temperature>=98) {
+		if(temperature>=95) {
 			machine.getWaterHeater().setHeaterOff();
 		}
 		if(temperature<70) {

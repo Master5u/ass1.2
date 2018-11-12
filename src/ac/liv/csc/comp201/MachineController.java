@@ -1,7 +1,5 @@
 package ac.liv.csc.comp201;
 
-import java.util.Arrays;
-
 import ac.liv.csc.comp201.control.CoinControl;
 import ac.liv.csc.comp201.control.DrinkMaking;
 import ac.liv.csc.comp201.control.HotWaterControl;
@@ -19,24 +17,6 @@ public class MachineController  extends Thread implements IMachineController {
 	private static final String version="1.22";
 	
 	private double currentCredit=0;
-	
-	private StringBuffer inputBuffer = new StringBuffer();
-	
-	private String keypadInput = "";
-	
-	private static final int MAX_CODE_LEN = 4;
-	
-	private static final int MIN_CODE_LEN = 3;
-	
-	private int orderCode[] = new int[MAX_CODE_LEN];
-	
-	private int keyCodeCount = 0;
-	
-	private int MEDIUM_CUP_PREFIX = 5;
-	
-	private int LARGE_CUP_PREFIX = 6;
-	
-	private int RETURN_CHANGE_BUTTON = 9;
 	
 	public void startController(IMachine machine) {
 		this.machine=machine;				// Machine that is being controlled
@@ -97,45 +77,6 @@ public class MachineController  extends Thread implements IMachineController {
 		}
 		int keyCode=machine.getKeyPad().getNextKeyCode();
 	//	System.out.println("Key is "+keyCode);
-		
-		if (keyCode != -1) {
-			if (keyCode == RETURN_CHANGE_BUTTON) {
-				handleCoin.returnChange();
-				machine.getCoinHandler().getCoinTray();
-				machine.getCoinHandler().clearCoinTry();
-			} else {
-				if (keyCodeCount < MAX_CODE_LEN) { // only store up maximum code length
-					orderCode[keyCodeCount++] = keyCode;
-				}
-				int codeLen = MIN_CODE_LEN;
-				if (orderCode[0] == LARGE_CUP_PREFIX) { // codes with prefix are a little longer
-					codeLen = MAX_CODE_LEN;
-				}
-				if (orderCode[0] == MEDIUM_CUP_PREFIX) { // codes with prefix are a little longer
-					codeLen = MAX_CODE_LEN;
-				}
-				if (keyCodeCount >= codeLen) { // we have got a key code of target length
-					for (int idx = 0; idx < codeLen; idx++) {
-						System.out.println("Code is " + orderCode[idx]);
-						inputBuffer.append(orderCode[idx]);
-					}
-					keypadInput = inputBuffer.toString();
-					System.out.println(keypadInput);
-					
-					// TO do check code is valid 101 102 etc, check balance
-					// check ingredient level if all ok then make a drink
-					boolean finish = false;
-					drinkMaking.makeDrink(keypadInput);
-					
-					
-					inputBuffer.delete(0, inputBuffer.length());
-					keypadInput = "";
-					keyCodeCount = 0; // used up this code
-				}
-			}
-
-		}
-
 		String coinCode=machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode!=null) {
 			System.out.println("Got coin code .."+coinCode);
@@ -149,7 +90,35 @@ public class MachineController  extends Thread implements IMachineController {
 			System.out.println(machine.getBalance());
 			
 		}
-//		switch (keyCode) {
+		switch (keyCode) {
+			case 0 :
+				System.out.println("Vending cup");
+				machine.vendCup(Cup.SMALL_CUP);break;
+			case 1 :
+				machine.getWaterHeater().setHeaterOn();								
+				break;
+			case 2 :
+				machine.getWaterHeater().setHeaterOff();break;
+			case 3 :
+				machine.getWaterHeater().setHotWaterTap(true);
+				break;
+			case 4 :
+				machine.getWaterHeater().setHotWaterTap(false);break;
+			case 5 :
+				machine.getHoppers().setHopperOn(Hoppers.COFFEE);break;
+			case 6 :
+				machine.getHoppers().setHopperOn(Hoppers.MILK);break;			
+			case 7 :
+				machine.getWaterHeater().setColdWaterTap(true);
+				break;
+			case 8 :
+				machine.getWaterHeater().setColdWaterTap(false);
+				break;
+//			case 9:
+//				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
+//				break;
+				
+				
 //			case 0 :
 //				System.out.println("Vending cup");
 //				machine.vendCup(Cup.SMALL_CUP);break;
@@ -173,13 +142,12 @@ public class MachineController  extends Thread implements IMachineController {
 //			case 8 :
 //				machine.getWaterHeater().setColdWaterTap(false);
 //				break;
-//			case 9:
-//				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
-//				break;
-//		}
-//		int inputFinish = keypadInput.length();
-//		if(inputFinish>=4) {
-//		}
+			case 9:
+				handleCoin.returnChange();
+				machine.getCoinHandler().getCoinTray();
+				machine.getCoinHandler().clearCoinTry();
+				break;
+		}
 		
 	}
 	
