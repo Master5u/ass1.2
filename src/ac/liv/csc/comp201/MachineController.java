@@ -38,6 +38,10 @@ public class MachineController  extends Thread implements IMachineController {
 	
 	private int RETURN_CHANGE_BUTTON = 9;
 	
+	private boolean lockKeypad = false;
+	
+	private boolean gotCup=false;
+	
 	public void startController(IMachine machine) {
 		this.machine=machine;				// Machine that is being controlled
 //		machine.getKeyPad().setCaption(0,"Cup");
@@ -52,9 +56,9 @@ public class MachineController  extends Thread implements IMachineController {
 //		machine.getKeyPad().setCaption(9, "test");//test button
 //		
 		
-		machine.getKeyPad().setCaption(0,"1");
-		machine.getKeyPad().setCaption(1,"2");
-		machine.getKeyPad().setCaption(2,"3");		
+		machine.getKeyPad().setCaption(0,"0");
+		machine.getKeyPad().setCaption(1,"1");
+		machine.getKeyPad().setCaption(2,"2");		
 		machine.getKeyPad().setCaption(3,"4");
 		machine.getKeyPad().setCaption(4,"5");		
 		machine.getKeyPad().setCaption(5,"6");
@@ -81,60 +85,166 @@ public class MachineController  extends Thread implements IMachineController {
 		// There is some basic code to show
 		// you the working of the machine
 		
+		
+		
 		CoinControl handleCoin = new CoinControl(machine);
 		HotWaterControl handleWater = new HotWaterControl(machine);
 		DrinkMaking drinkMaking = new DrinkMaking(machine);
 		
-		handleWater.controlTemperature();
-		handleWater.cannotControlTemperature();
 		
 		Cup cup=machine.getCup();
-		if (cup!=null) {
-			System.out.println("Water level is "+cup.getWaterLevelLitres()+" coffee is "+cup.getCoffeeGrams()+" grams"+" temp is "+cup.getTemperatureInC());
-			if (cup.getCoffeeGrams()>=5) {
-				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
-			}
-		}
-		int keyCode=machine.getKeyPad().getNextKeyCode();
-	//	System.out.println("Key is "+keyCode);
 		
-		if (keyCode != -1) {
-			if (keyCode == RETURN_CHANGE_BUTTON) {
-				handleCoin.returnChange();
-				machine.getCoinHandler().getCoinTray();
-				machine.getCoinHandler().clearCoinTry();
-			} else {
-				if (keyCodeCount < MAX_CODE_LEN) { // only store up maximum code length
-					orderCode[keyCodeCount++] = keyCode;
-				}
-				int codeLen = MIN_CODE_LEN;
-				if (orderCode[0] == LARGE_CUP_PREFIX) { // codes with prefix are a little longer
-					codeLen = MAX_CODE_LEN;
-				}
-				if (orderCode[0] == MEDIUM_CUP_PREFIX) { // codes with prefix are a little longer
-					codeLen = MAX_CODE_LEN;
-				}
-				if (keyCodeCount >= codeLen) { // we have got a key code of target length
-					for (int idx = 0; idx < codeLen; idx++) {
-						System.out.println("Code is " + orderCode[idx]);
-						inputBuffer.append(orderCode[idx]);
+		if (cup!=null) {
+			if (machine.getCup().getWaterLevelLitres()==0) {
+			              gotCup=true;
+			}
+			}
+
+		if (lockKeypad != true) {
+
+			handleWater.controlTemperature();
+			handleWater.cannotControlTemperature();
+			int keyCode = machine.getKeyPad().getNextKeyCode();
+			// System.out.println("Key is "+keyCode);
+
+			if (keyCode != -1) {
+				if (keyCode == RETURN_CHANGE_BUTTON) {
+					handleCoin.returnChange();
+					machine.getCoinHandler().getCoinTray();
+					machine.getCoinHandler().clearCoinTry();
+				} else {
+					if (keyCodeCount < MAX_CODE_LEN) { // only store up maximum code length
+						orderCode[keyCodeCount++] = keyCode;
 					}
-					keypadInput = inputBuffer.toString();
-					System.out.println(keypadInput);
-					
-					// TO do check code is valid 101 102 etc, check balance
-					// check ingredient level if all ok then make a drink
-					boolean finish = false;
-					drinkMaking.makeDrink(keypadInput);
-					
-					
-					inputBuffer.delete(0, inputBuffer.length());
-					keypadInput = "";
-					keyCodeCount = 0; // used up this code
+					int codeLen = MIN_CODE_LEN;
+					if (orderCode[0] == LARGE_CUP_PREFIX) { // codes with prefix are a little longer
+						codeLen = MAX_CODE_LEN;
+					}
+					if (orderCode[0] == MEDIUM_CUP_PREFIX) { // codes with prefix are a little longer
+						codeLen = MAX_CODE_LEN;
+					}
+					if (keyCodeCount >= codeLen) { // we have got a key code of target length
+						for (int idx = 0; idx < codeLen; idx++) {
+							System.out.println("Code is " + orderCode[idx]);
+							inputBuffer.append(orderCode[idx]);
+						}
+						keypadInput = inputBuffer.toString();
+						System.out.println(keypadInput);
+
+						// TO do check code is valid 101 102 etc, check balance
+						// check ingredient level if all ok then make a drink
+						// drinkMaking.makeDrink(keypadInput);
+
+//					inputBuffer.delete(0, inputBuffer.length());
+//					keypadInput = "";
+//					keyCodeCount = 0; // used up this code
+					}
 				}
+
 			}
 
 		}
+		if (keypadInput.length() != 0) {
+			switch (keypadInput) {
+			case "101":
+				if(gotCup==false) {
+				System.out.println(gotCup);
+				machine.vendCup(Cup.SMALL_CUP);
+				System.out.println("!!!");
+				gotCup = true;
+				}
+				break;
+			}}
+		
+		if (keypadInput.length() != 0) {
+			switch (keypadInput) {
+			case "101":
+				lockKeypad = true;
+				System.out.println("This is samll black coffee");
+				
+				    // code to make the drink
+				if (cup != null) {
+					if (machine.getCup().getCoffeeGrams() < 2) {
+						System.out.println(cup);
+						machine.getHoppers().setHopperOn(Hoppers.COFFEE);
+						System.out.println(machine.getCup().getCoffeeGrams());
+					}else {
+						machine.getHoppers().setHopperOff(Hoppers.COFFEE);
+					}
+
+					if (machine.getWaterHeater().getTemperatureDegreesC() <= 95.9) {
+						machine.getWaterHeater().setHeaterOn();
+					}
+
+					if (machine.getCup().getWaterLevelLitres() < 0.31) {
+						machine.getWaterHeater().setHotWaterTap(true);
+					}
+					machine.getWaterHeater().setHotWaterTap(false);
+
+					if (machine.getCup().getWaterLevelLitres() < 0.34) {
+						machine.getWaterHeater().setColdWaterTap(true);
+					}
+					machine.getWaterHeater().setColdWaterTap(false);
+
+					if (machine.getCup().getWaterLevelLitres() > 0.34) {
+						lockKeypad = false;
+						inputBuffer.delete(0, inputBuffer.length());
+						keypadInput = "";
+						keyCodeCount = 0; // used up this code
+						machine.getDisplay().setTextString("Finish!");
+					}
+				}
+				break;
+			case "5101":
+				System.out.println("This is medium black coffee");
+				break;
+			case "6101":
+				System.out.println("This is large black coffee");
+				break;
+			case "102":
+				System.out.println("This is samll black coffee with sugar");
+				break;
+			case "5102":
+				System.out.println("This is medium black coffee with sugar");
+				break;
+			case "6102":
+				System.out.println("This is large black coffee with sugar");
+				break;
+			case "201":
+				System.out.println("This is samll white coffee");
+				break;
+			case "5201":
+				System.out.println("This is medium white coffee");
+				break;
+			case "6201":
+				System.out.println("This is large white coffee");
+				break;
+			case "202":
+				System.out.println("This is samll white coffee with sugar");
+				break;
+			case "5202":
+				System.out.println("This is medium white coffee with sugar");
+				break;
+			case "6202":
+				System.out.println("This is large white coffee with sugar");
+				break;
+			case "300":
+				System.out.println("This is samll hot chocolate");
+				break;
+			case "5300":
+				System.out.println("This is medium hot chocolate");
+				break;
+			case "6300":
+				System.out.println("This is large hot chocolate");
+				break;
+			default:
+				machine.getDisplay().setTextString("invaild code");
+				inputBuffer.delete(0, inputBuffer.length());
+				keypadInput = "";
+				keyCodeCount = 0; // used up this code
+			}
+		}
+		
 
 		String coinCode=machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode!=null) {

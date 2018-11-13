@@ -86,7 +86,7 @@ public class DrinkMaking {
 		case "6300" :
 			System.out.println("This is large hot chocolate");
 			break;
-		default:machine.getDisplay().setTextString("Please input right code");
+		default:machine.getDisplay().setTextString("invaild code");
 		}
 	}
 	
