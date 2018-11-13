@@ -33,7 +33,7 @@ public class Hoppers extends JPanel implements IHoppers {
 	
 	private static final String captions[]={"Coffee","Milk (powder)","Sugar","Chocolate"};
 	
-	private static final float amounts[]={0.1f,0.11f,0.073f,0.12f };
+	private static final float amounts[]={0.1f,0.11f,0.073f,1f }; 
 	
 	private static final String fileName="hopperState.txt";
 

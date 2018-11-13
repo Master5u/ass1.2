@@ -31,9 +31,9 @@ import ac.liv.csc.comp201.model.IMachine;
 public class CoinHandler extends JFrame implements ICoinHandler, Temp {
 	
 	
-	public static final String coinCodes[]={"ab","ac","ba","bc","bd","ef","zz" };
+	private static final String coinCodes[]={"ab","ac","ba","bc","bd","ef","zz" };
 	
-	public static final String coinNames[]={"1p","5p","10p","20p","50p","100p" };
+	private static final String coinNames[]={"1p","5p","10p","20p","50p","100p" };
 	
 	private static final String fileName="coinHandlerState.txt";
 	
@@ -173,7 +173,7 @@ public class CoinHandler extends JFrame implements ICoinHandler, Temp {
 	
 	private int coinWidth=120;
 	
-	private boolean coinHandlerOpen=false;
+	private boolean coinHandlerOpen=true;
 	
 	
 	/* (non-Javadoc)
@@ -263,8 +263,10 @@ public class CoinHandler extends JFrame implements ICoinHandler, Temp {
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent actionEvent) {
-					addCoin(actionEvent.getActionCommand());
-					coinCodeBuffer.add(actionEvent.getActionCommand());				}
+					if (coinHandlerOpen) {
+					   addCoin(actionEvent.getActionCommand());
+					   coinCodeBuffer.add(actionEvent.getActionCommand());				}
+				    }
 				
 			});
 			this.getContentPane().add(button);
@@ -281,8 +283,7 @@ public class CoinHandler extends JFrame implements ICoinHandler, Temp {
 	@Override
 	public void clearCoinTry() {
 		coinTray="";
-
-		
+		save();
 	}
 
 }
