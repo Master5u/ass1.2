@@ -27,42 +27,42 @@ public class DrinkControl {
 	public boolean validBalance(int orderCode[], String keypadInput) {
 		// check balance
 		if (keypadInput.equals("101") | keypadInput.equals("201")) {
-			if (machine.getBalance() > 120) {
+			if (machine.getBalance() >= 120) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("102") | keypadInput.equals("202") | keypadInput.equals("5300")) {
-			if (machine.getBalance() > 130) {
+			if (machine.getBalance() >= 130) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("300")) {
-			if (machine.getBalance() > 110) {
+			if (machine.getBalance() >= 110) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("5101") | keypadInput.equals("5201")) {
-			if (machine.getBalance() > 140) {
+			if (machine.getBalance() >= 140) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("5102") | keypadInput.equals("5202")) {
-			if (machine.getBalance() > 150) {
+			if (machine.getBalance() >= 150) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("6101") | keypadInput.equals("6201")) {
-			if (machine.getBalance() > 145) {
+			if (machine.getBalance() >= 145) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("6102") | keypadInput.equals("6202")) {
-			if (machine.getBalance() > 155) {
+			if (machine.getBalance() >= 155) {
 				return true;
 			}
 		}
 		if (keypadInput.equals("6300")) {
-			if (machine.getBalance() > 1350) {
+			if (machine.getBalance() >= 135) {
 				return true;
 			}
 		}

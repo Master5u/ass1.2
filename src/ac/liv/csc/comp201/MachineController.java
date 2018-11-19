@@ -67,14 +67,6 @@ public class MachineController extends Thread implements IMachineController {
 
 	private synchronized void runStateMachine() {
 
-		// System.out.println("Running state machine");
-
-		// TO DO
-		// Add your code to run the drinks machine
-		// in here
-		// There is some basic code to show
-		// you the working of the machine
-
 		CoinControl handleCoin = new CoinControl(machine);
 		HotWaterControl handleWater = new HotWaterControl(machine);
 		DrinkMaking drinkMaking = new DrinkMaking(machine);
@@ -87,9 +79,9 @@ public class MachineController extends Thread implements IMachineController {
 			handleWater.cannotControlTemperature();
 		}
 
+		int keyCode = machine.getKeyPad().getNextKeyCode();
 		if (lockKeypad == false) {
 
-			int keyCode = machine.getKeyPad().getNextKeyCode();
 			// System.out.println("Key is "+keyCode);
 
 			if (keyCode != -1) {
@@ -148,6 +140,7 @@ public class MachineController extends Thread implements IMachineController {
 										machine.vendCup(Cup.LARGE_CUP);
 									}
 									 lockKeypad = true;
+									 System.out.println(lockKeypad);
 									 machine.getDisplay().setTextString("start to make drink");
 								}else {
 									machine.getDisplay().setTextString("Ingredients not enough");
@@ -167,12 +160,11 @@ public class MachineController extends Thread implements IMachineController {
 			}
 		}
 		
-//			// code to make the drink
+//		code to make the drink
 		if (cup != null) {
 			
-			System.out.println("cup!"+cup.getCoffeeGrams()+cup.getWaterLevelLitres());
-			if(cup.getWaterLevelLitres()==0) {
-				if(cup.getCoffeeGrams()<ingredientsTemperature[0]) {
+			System.out.println("cup!"+cup.getCoffeeGrams()+" "+cup.getMilkGrams()+" "+cup.getSugarGrams()+" "+cup.getSugarGrams()+" "+cup.getChocolateGrams()+" "+cup.getWaterLevelLitres());
+			if(cup.getCoffeeGrams()<ingredientsTemperature[0]) {
 				machine.getHoppers().setHopperOn(Hoppers.COFFEE);
 			}else {
 				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
@@ -192,9 +184,11 @@ public class MachineController extends Thread implements IMachineController {
 			}else {
 				machine.getHoppers().setHopperOff(Hoppers.CHOCOLATE);
 			}
-			}
 			
 			if(cup.getWaterLevelLitres()==0) {
+				
+				machine.getCoinHandler().lockCoinHandler();	
+				
 				if(machine.getWaterHeater().getTemperatureDegreesC()<=ingredientsTemperature[4]) {
 					temperatureControl = false;
 					machine.getWaterHeater().setHeaterOn();
@@ -229,12 +223,12 @@ public class MachineController extends Thread implements IMachineController {
 			if(cup.getWaterLevelLitres()>=ingredientsTemperature[5]) {
 				machine.getWaterHeater().setHotWaterTap(false);
 				machine.getWaterHeater().setColdWaterTap(false);
+				machine.getCoinHandler().unlockCoinHandler();
 				lockKeypad = false;
 				temperatureControl = true;
-				System.out.println("444");
 			}
 		}
-
+		
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode != null) {
 			System.out.println("Got coin code .." + coinCode);
@@ -247,6 +241,7 @@ public class MachineController extends Thread implements IMachineController {
 			System.out.println(machine.getBalance());
 		}
 	}
+	
 
 	public void run() {
 		// Controlling thread for coffee machine
