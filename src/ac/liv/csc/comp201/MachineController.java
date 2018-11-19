@@ -85,7 +85,6 @@ public class MachineController extends Thread implements IMachineController {
 		if(temperatureControl==true) {
 			handleWater.controlTemperature();// 控制温度
 			handleWater.cannotControlTemperature();
-			System.out.println("11");
 		}
 
 		if (lockKeypad == false) {
@@ -139,7 +138,7 @@ public class MachineController extends Thread implements IMachineController {
 								//put cup
 								if(validIngredients) {
 									System.out.println("ingredients enough");
-									if(orderCode[0] == 1) {
+									if(orderCode[0] == 1|orderCode[0] == 2|orderCode[0] == 3) {
 										machine.vendCup(Cup.SMALL_CUP);
 									}
 									if(orderCode[0] == MEDIUM_CUP_PREFIX) {
@@ -172,7 +171,8 @@ public class MachineController extends Thread implements IMachineController {
 		if (cup != null) {
 			
 			System.out.println("cup!"+cup.getCoffeeGrams()+cup.getWaterLevelLitres());
-			if(cup.getCoffeeGrams()<ingredientsTemperature[0]) {
+			if(cup.getWaterLevelLitres()==0) {
+				if(cup.getCoffeeGrams()<ingredientsTemperature[0]) {
 				machine.getHoppers().setHopperOn(Hoppers.COFFEE);
 			}else {
 				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
@@ -192,6 +192,8 @@ public class MachineController extends Thread implements IMachineController {
 			}else {
 				machine.getHoppers().setHopperOff(Hoppers.CHOCOLATE);
 			}
+			}
+			
 			if(cup.getWaterLevelLitres()==0) {
 				if(machine.getWaterHeater().getTemperatureDegreesC()<=ingredientsTemperature[4]) {
 					temperatureControl = false;
@@ -200,18 +202,30 @@ public class MachineController extends Thread implements IMachineController {
 					machine.getWaterHeater().setHotWaterTap(true);
 				}
 			}
-//			if(cup.getWaterLevelLitres()<ingredientsTemperature[5]) {
+//			if(cup.getWaterLevelLitres()<ingredientsTemperature[5]) 
 //				if(cup.getTemperatureInC()>84) {
 //					machine.getWaterHeater().setColdWaterTap(true);
 //				}
 //			}
-			if(cup.getWaterLevelLitres()>0&&cup.getWaterLevelLitres()<ingredientsTemperature[5]) {
+			if(cup.getWaterLevelLitres()>0&&cup.getWaterLevelLitres()<ingredientsTemperature[5]*0.2) {
 				machine.getWaterHeater().setHotWaterTap(true);
+				if(machine.getWaterHeater().getTemperatureDegreesC()>=ingredientsTemperature[4]) {
+					machine.getWaterHeater().setHotWaterTap(true);
+				}else {
+					machine.getWaterHeater().setHotWaterTap(false);
+				}
 			}
-			if(cup.getWaterLevelLitres()>ingredientsTemperature[6]&&cup.getWaterLevelLitres()<ingredientsTemperature[5]) {
-				machine.getWaterHeater().setHotWaterTap(false);
-				machine.getWaterHeater().setColdWaterTap(true);
+			if(cup.getWaterLevelLitres()>ingredientsTemperature[5]*0.2&&cup.getWaterLevelLitres()<ingredientsTemperature[5]) {
+				if(cup.getTemperatureInC()>=80) {
+					//machine.getWaterHeater().setHeaterOff();
+					machine.getWaterHeater().setColdWaterTap(true);
+				}else {
+					machine.getWaterHeater().setHeaterOn();
+					machine.getWaterHeater().setColdWaterTap(false);
+					machine.getWaterHeater().setHotWaterTap(true);
+				}
 			}
+
 			if(cup.getWaterLevelLitres()>=ingredientsTemperature[5]) {
 				machine.getWaterHeater().setHotWaterTap(false);
 				machine.getWaterHeater().setColdWaterTap(false);

@@ -182,7 +182,7 @@ public class DrinkControl {
 	public double[] getIngredientsTemperature(int orderCode[], String keypadInput) {
 		double[] initial = {0,0,0,0,0,0};
 		if (keypadInput.equals("101")) {
-			double[] ingredientsTemperature = {2, 0, 0, 0, 95.9, 0.34, 0.31};
+			double[] ingredientsTemperature = {2, 0, 0, 0, 95.9, 0.34};
 			return ingredientsTemperature;
 		}
 		if (keypadInput.equals("5101")) {
