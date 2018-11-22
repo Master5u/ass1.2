@@ -10,7 +10,9 @@ public class HotWaterControl {
 		// TODO Auto-generated constructor stub
 		this.machine = machine;
 	}
-	
+
+//..........................................................................................
+/*This block deals with error situation */
 	public void cannotControlTemperature() {
 		if(machine.getWaterHeater().getHeaterOnStatus()==false) {
 			if(machine.getWaterHeater().getHeaterOnStatus()==true) {
@@ -19,7 +21,9 @@ public class HotWaterControl {
 			}
 		}
 	}
-	
+
+//..........................................................................................
+/*This block control temperature at 75 before making drinks */
 	public void controlTemperature () {
 		float temperature = machine.getWaterHeater().getTemperatureDegreesC();
 		if(temperature>=75) {

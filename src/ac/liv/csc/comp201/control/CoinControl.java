@@ -12,7 +12,8 @@ public class CoinControl {
 	public CoinControl (IMachine machine) {
 		this.machine = machine;
 	}
-	
+//..........................................................................................
+/*This block output coin level in console */
 	public void printCoinLevel() { //print coin in console
 		for(int index=0; index<coinCodes.length;index++) {
 			if(index<coinNames.length) {
@@ -22,8 +23,9 @@ public class CoinControl {
 		System.out.println(" ");
 	}
 	
+//..........................................................................................
+/*This block calculate current balacne */
 	public double insertedCoin (String coinCode, double currentCredit) {
-		//need change line; should be in Machinecontroller
 		int coin = machine.getBalance();
 		switch (coinCode) {
 		case "ab" : coin+=1;break;
@@ -38,14 +40,13 @@ public class CoinControl {
 		return currentCredit;
 	}
 	
+//..........................................................................................
+/*This block return balance */
 	public void returnChange () {
 		System.out.println("start changes");
 		int change = machine.getBalance();		
 		for(int index = coinValue.length-1;index>=0;index--) {
 			while(change/coinValue[index]>0&&machine.getCoinHandler().coinAvailable(coinCodes[index])) {
-//				int time = 1;
-//				System.out.println(index+" times: "+time);
-//				time++;
 					machine.getCoinHandler().dispenseCoin(coinCodes[index]);
 					change = change-coinValue[index];
 					machine.setBalance(change);

@@ -1,10 +1,6 @@
 package ac.liv.csc.comp201;
-
-import java.util.Arrays;
-
 import ac.liv.csc.comp201.control.CoinControl;
 import ac.liv.csc.comp201.control.DrinkControl;
-import ac.liv.csc.comp201.control.DrinkMaking;
 import ac.liv.csc.comp201.control.HotWaterControl;
 import ac.liv.csc.comp201.model.IMachine;
 import ac.liv.csc.comp201.model.IMachineController;
@@ -43,7 +39,7 @@ public class MachineController extends Thread implements IMachineController {
 	
 	private boolean temperatureControl = true;
 	
-	private double [] ingredientsTemperature = {0,0,0,0,0,0};
+	private double [] ingredientsTemperature = {0,0,0,0,0,0}; 
 
 	public void startController(IMachine machine) {
 		this.machine = machine; // Machine that is being controlled
@@ -66,30 +62,39 @@ public class MachineController extends Thread implements IMachineController {
 	}
 
 	private synchronized void runStateMachine() {
-
+		
+		//initialize three classes which will be used in behind
 		CoinControl handleCoin = new CoinControl(machine);
 		HotWaterControl handleWater = new HotWaterControl(machine);
-		DrinkMaking drinkMaking = new DrinkMaking(machine);
 		DrinkControl drinkControl = new DrinkControl(machine);
+
+//..........................................................................................
+/*This block checks cups and keeps temperature*/
 		
+		//check and get cups
 		Cup cup = machine.getCup();
 		
+		//control temperature not too high or too low
 		if(temperatureControl==true) {
-			handleWater.controlTemperature();// 控制温度
+			handleWater.controlTemperature();
 			handleWater.cannotControlTemperature();
 		}
-
+//..........................................................................................
+/*In this block, first, it controls the keypad. Then, it checks the keypad input, ingredients and balance.
+ If all conditions are satisfied, it will put cups. */
+		
+		//get keypad input
 		int keyCode = machine.getKeyPad().getNextKeyCode();
 		if (lockKeypad == false) {
-
-			// System.out.println("Key is "+keyCode);
-
 			if (keyCode != -1) {
 				if (keyCode == RETURN_CHANGE_BUTTON) {
+					//get changes and display
 					handleCoin.returnChange();
-//					machine.getCoinHandler().getCoinTray();
-//					machine.getCoinHandler().clearCoinTry();
+					double displayChange = machine.getBalance();
+					double displayC = displayChange/100;
+					machine.getDisplay().setTextString("your balance are "+displayC+" Pound");
 				} else {
+					//record input number
 					if (keyCodeCount < MAX_CODE_LEN) { // only store up maximum code length
 						orderCode[keyCodeCount++] = keyCode;
 					}
@@ -100,6 +105,16 @@ public class MachineController extends Thread implements IMachineController {
 					if (orderCode[0] == MEDIUM_CUP_PREFIX) { // codes with prefix are a little longer
 						codeLen = MAX_CODE_LEN;
 					}
+					
+					//display inputed number on screen
+					String displayCoin = "";
+					for(int i=0; i<keyCodeCount; i++) {
+						String nowCoin = String.valueOf(orderCode[i]);
+						displayCoin = displayCoin+nowCoin;
+					}
+					machine.getDisplay().setTextString("Your input: "+displayCoin);
+					
+					//save the inputed numbers
 					if (keyCodeCount >= codeLen) { // we have got a key code of target length
 						for (int idx = 0; idx < codeLen; idx++) {
 							System.out.println("Code is " + orderCode[idx]);
@@ -107,9 +122,6 @@ public class MachineController extends Thread implements IMachineController {
 						}
 						keypadInput = inputBuffer.toString();
 						System.out.println(keypadInput);
-
-						// TO do check code is valid 101 102 etc, check balance
-						// check ingredient level if all ok then make a drink
 						
 						// valid input
 						boolean validInput = drinkControl.validInput(orderCode,keypadInput);
@@ -118,9 +130,10 @@ public class MachineController extends Thread implements IMachineController {
 						//valid ingredients
 						//{"Coffee","Milk (powder)","Sugar","Chocolate","Temperature","Cup litres"};
 						boolean validIngredients = drinkControl.validIngredients(orderCode, keypadInput);
-						
+						//check valid input
 						if(validInput) {
 							System.out.println("validInput");
+							// check balance
 							if(validBalance) {
 								System.out.println("balance enough");
 								//deduct balance
@@ -151,19 +164,25 @@ public class MachineController extends Thread implements IMachineController {
 						}else {
 							machine.getDisplay().setTextString("invalid input");
 						}
-
+						// clear buffer
 						inputBuffer.delete(0, inputBuffer.length());
 						keypadInput = "";
-						keyCodeCount = 0; // used up this code
+						keyCodeCount = 0;
 					}
 				}
 			}
 		}
-		
-//		code to make the drink
+//..........................................................................................
+/*This block is about making drinks. It will put ingredients at first. 
+  1,When cup's litres is 0, lock keypad and coin control, open water heater 
+  until the temperature up to drink initial temperature.
+  2,When cup's litres >0 and <20%, put hot water in initial temperature.
+  3,When cup's litres >20% and <100%, put water and keep drink's temperature between 76 and 84 degree.
+  4,When cup's litres >=100%, turn off water tap, unlock keypad and coin handler.
+  */
 		if (cup != null) {
-			
-			System.out.println("cup!"+cup.getCoffeeGrams()+" "+cup.getMilkGrams()+" "+cup.getSugarGrams()+" "+cup.getSugarGrams()+" "+cup.getChocolateGrams()+" "+cup.getWaterLevelLitres());
+			System.out.println("Cup "+"Coffee:"+cup.getCoffeeGrams()+" Milk:"+cup.getMilkGrams()+" Sugar:"+cup.getSugarGrams()+" Chocolate:"+cup.getChocolateGrams()+" Water:"+cup.getWaterLevelLitres());
+			//put ingredients
 			if(cup.getCoffeeGrams()<ingredientsTemperature[0]) {
 				machine.getHoppers().setHopperOn(Hoppers.COFFEE);
 			}else {
@@ -185,10 +204,9 @@ public class MachineController extends Thread implements IMachineController {
 				machine.getHoppers().setHopperOff(Hoppers.CHOCOLATE);
 			}
 			
+			//When cup's litres is 0, lock keypad and coin control, open water heater until the temperature up to drink initial temperature.
 			if(cup.getWaterLevelLitres()==0) {
-				
 				machine.getCoinHandler().lockCoinHandler();	
-				
 				if(machine.getWaterHeater().getTemperatureDegreesC()<=ingredientsTemperature[4]) {
 					temperatureControl = false;
 					machine.getWaterHeater().setHeaterOn();
@@ -196,11 +214,8 @@ public class MachineController extends Thread implements IMachineController {
 					machine.getWaterHeater().setHotWaterTap(true);
 				}
 			}
-//			if(cup.getWaterLevelLitres()<ingredientsTemperature[5]) 
-//				if(cup.getTemperatureInC()>84) {
-//					machine.getWaterHeater().setColdWaterTap(true);
-//				}
-//			}
+
+			//When cup's litres >0 and <20%, put hot water in initial temperature.
 			if(cup.getWaterLevelLitres()>0&&cup.getWaterLevelLitres()<ingredientsTemperature[5]*0.2) {
 				machine.getWaterHeater().setHotWaterTap(true);
 				if(machine.getWaterHeater().getTemperatureDegreesC()>=ingredientsTemperature[4]) {
@@ -209,9 +224,10 @@ public class MachineController extends Thread implements IMachineController {
 					machine.getWaterHeater().setHotWaterTap(false);
 				}
 			}
+			
+			//When cup's litres >20% and <100%, put water and keep drink's temperature between 76 and 84 degree.
 			if(cup.getWaterLevelLitres()>ingredientsTemperature[5]*0.2&&cup.getWaterLevelLitres()<ingredientsTemperature[5]) {
 				if(cup.getTemperatureInC()>=80) {
-					//machine.getWaterHeater().setHeaterOff();
 					machine.getWaterHeater().setColdWaterTap(true);
 				}else {
 					machine.getWaterHeater().setHeaterOn();
@@ -219,7 +235,8 @@ public class MachineController extends Thread implements IMachineController {
 					machine.getWaterHeater().setHotWaterTap(true);
 				}
 			}
-
+			
+			//When cup's litres >=100%, turn off water tap, unlock keypad and coin handler.
 			if(cup.getWaterLevelLitres()>=ingredientsTemperature[5]) {
 				machine.getWaterHeater().setHotWaterTap(false);
 				machine.getWaterHeater().setColdWaterTap(false);
@@ -228,20 +245,19 @@ public class MachineController extends Thread implements IMachineController {
 				temperatureControl = true;
 			}
 		}
-		
+//..........................................................................................
+/*This block shows the coin handle */
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode != null) {
 			System.out.println("Got coin code .." + coinCode);
 			machine.getDisplay().setTextString("Got coin code .." + coinCode);
-
 			currentCredit = handleCoin.insertedCoin(coinCode, currentCredit);
-			machine.getDisplay().setTextString("Now coin" + (currentCredit / 100));
-			// handleCoin.CoinAmount(coinCode);
+			machine.getDisplay().setTextString("Now coin" + (currentCredit / 100)+" Pound");
 			handleCoin.printCoinLevel();
 			System.out.println(machine.getBalance());
 		}
 	}
-	
+//..........................................................................................
 
 	public void run() {
 		// Controlling thread for coffee machine

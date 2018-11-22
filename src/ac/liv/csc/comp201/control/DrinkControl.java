@@ -11,6 +11,8 @@ public class DrinkControl {
 		this.machine = machine;
 	}
 
+//..........................................................................................
+/*This block judges whether input is valid or not */
 	public boolean validInput(int orderCode[], String keypadInput) {
 		if (keypadInput.equals("101") | keypadInput.equals("102") | keypadInput.equals("201")
 				| keypadInput.equals("202") | keypadInput.equals("300") | keypadInput.equals("5101")
@@ -20,10 +22,11 @@ public class DrinkControl {
 			return true;
 		} else {
 			return false;
-
 		}
 	}
 
+//..........................................................................................
+/*This block judges whether balance is enough or not */
 	public boolean validBalance(int orderCode[], String keypadInput) {
 		// check balance
 		if (keypadInput.equals("101") | keypadInput.equals("201")) {
@@ -69,6 +72,8 @@ public class DrinkControl {
 		return false;
 	}
 	
+//..........................................................................................
+/*This block deduct drinks spend */
 	public void deductBalance(int orderCode[], String keypadInput) {
 		// deduct balance
 		if (keypadInput.equals("101") | keypadInput.equals("201")) {
@@ -99,6 +104,8 @@ public class DrinkControl {
 		machine.getDisplay().setTextString(balacne);
 	}
 
+//..........................................................................................
+/*This block checks ingredients */	
 	public boolean validIngredients(int orderCode[], String keypadInput) {
 		if (keypadInput.equals("101")) {
 			if (machine.getHoppers().getHopperLevelsGrams(Hoppers.COFFEE)>2) {
@@ -177,6 +184,8 @@ public class DrinkControl {
 		}
 		return false;
 	}
+//..........................................................................................
+/*This block return the amount of drink's ingredients */
 	
 	//	{"Coffee","Milk (powder)","Sugar","Chocolate","Temperature","Cup litres"};
 	public double[] getIngredientsTemperature(int orderCode[], String keypadInput) {
